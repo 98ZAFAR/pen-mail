@@ -1,6 +1,6 @@
 const CalculateDelay = (fromCountry, toCountry) => {
   // Basic delay calculation based on countries
-  const baseDelay = 10000; // 10 seconds
+  const baseDelay = 20000; // 20 seconds
   const countryMultiplier = {
     "USA": 1,
     "UK": 1.2,
