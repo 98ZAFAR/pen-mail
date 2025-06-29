@@ -1,5 +1,4 @@
 const express = require("express");
-const { ValidateUser } = require("../../middlewares/auth/verifyUser");
 const {
   getUserProfile,
   updateUserProfile,
@@ -15,25 +14,20 @@ const upload = require("../../middlewares/cloud/upload");
 const router = express.Router();
 
 // User routes
-router.get("/profile", ValidateUser, getUserProfile);
-router.put(
-  "/update",
-  ValidateUser,
-  upload.single("avatarUrl"),
-  updateUserProfile
-);
+router.get("/profile", getUserProfile);
+router.put("/update", upload.single("avatarUrl"), updateUserProfile);
 
 // Friend routes
-router.put("/connect-friend/:friendId", ValidateUser, connectFriend);
-router.get("/get-friends", ValidateUser, getFriends);
-router.get("/get-friends/:friendId", ValidateUser, getFriendProfile);
+router.put("/connect-friend/:friendId", connectFriend);
+router.get("/get-friends", getFriends);
+router.get("/get-friends/:friendId", getFriendProfile);
 
 // Friend request routes
-router.put("/friend-request/:requestId", ValidateUser, acceptFriendRequest);
-router.delete("/friend-request/:requestId", ValidateUser, rejectFriendRequest);
-router.get("/friend-requests", ValidateUser, getFriendRequests);
+router.put("/friend-request/:requestId", acceptFriendRequest);
+router.delete("/friend-request/:requestId", rejectFriendRequest);
+router.get("/friend-requests", getFriendRequests);
 
 // Discover users route
-router.get("/discover", ValidateUser, getDiscoverUsers);
+router.get("/discover", getDiscoverUsers);
 
 module.exports = router;

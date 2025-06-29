@@ -1,4 +1,5 @@
 const Letter = require("../../models/letter/model");
+const Stamp = require("../../models/stamp/model");
 const User = require("../../models/user/model");
 const CalculateDelay = require("../../utils/calcDelay");
 
@@ -30,7 +31,7 @@ const sendLetter = async (req, res) => {
     });
 
     if (stampId) {
-      const stamp = await User.findById(stampId);
+      const stamp = await Stamp.findById(stampId);
       if (!stamp) {
         return res
           .status(404)
@@ -48,6 +49,18 @@ const sendLetter = async (req, res) => {
       `Letter sent to ${recipientId}: ${body} (Subject: ${subject}, Stamp ID: ${stampId})`
     );
 
+    if (stampId) {
+      await User.findByIdAndUpdate(senderId,{
+          $addToSet: { collectedStamps: stampId },
+        },
+      ).catch((error) => {
+        console.error("Error updating user's collected stamps:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Internal server error while updating stamps.",
+        });
+      });
+    }
     res
       .status(200)
       .json({ success: true, message: "Letter sent successfully!" });
@@ -123,7 +136,10 @@ const getLetter = async (req, res) => {
         .json({ success: false, message: "Letter not found." });
     }
 
-    if(letter.status === "received") {
+    if (
+      letter.status === "received" &&
+      letter.recipient._id.toString() === req.user._id.toString()
+    ) {
       letter.status = "read";
       await letter.save();
     }

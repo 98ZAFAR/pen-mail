@@ -12,13 +12,19 @@ const stampSchema = new mongoose.Schema(
       required: true,
       default: "common",
     },
+    description: {
+      type: String,
+      required: true,
+      maxlength: 500, // Limit description length
+    },
     imageUrl: {
       type: String,
       required: true,
     },
-    cost: {
-      type: Number,
+    countryCode: {
+      type: String,
       required: true,
+      default: "global",
     },
   },
   { timestamps: true }

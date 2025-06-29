@@ -1,5 +1,4 @@
 const express = require("express");
-const { ValidateUser } = require("../../middlewares/auth/verifyUser");
 const {
   sendLetter,
   getInbox,
@@ -10,12 +9,12 @@ const {
 const router = express.Router();
 
 // Letter routes
-router.post("/send-letter", ValidateUser, sendLetter);
-router.get("/get-letter/:id", ValidateUser, getLetter);
-router.delete("/delete-letter/:id", ValidateUser, deleteLetter);
+router.post("/send-letter", sendLetter);
+router.get("/get-letter/:id", getLetter);
+router.delete("/delete-letter/:id", deleteLetter);
 
 // Inbox and Outbox routes
-router.get("/inbox", ValidateUser, getInbox);
-router.get("/outbox", ValidateUser, getOutbox);
+router.get("/inbox", getInbox);
+router.get("/outbox", getOutbox);
 
 module.exports = router;

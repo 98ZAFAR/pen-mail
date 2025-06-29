@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
     },
     languages: {
       type: [String],
-      default: ['en'], // Default to English
+      default: ["en"], // Default to English
       validate: {
         validator: function (v) {
           return v.length <= 5; // Limit to 5 languages
@@ -68,15 +68,21 @@ const userSchema = new mongoose.Schema(
         message: "Interests cannot exceed 10 items.",
       },
     },
-    role:{
-        type: String,
-        enum: ["user", "admin"],
-        default: "user", // Default role is user
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user", // Default role is user
     },
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+      },
+    ],
+    collectedStamps: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Stamp",
       },
     ],
   },

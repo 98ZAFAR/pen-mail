@@ -23,18 +23,30 @@ app.use(cors(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+//Scheduler Setup
+require('./services/schedulers/letterDelivery');
+
 // Importing Routes
 const authRoutes = require('./routes/auth/routes');
+const adminRoutes = require('./routes/admin/routes');
 const userRoutes = require('./routes/user/routes');
 const generalRoutes = require('./routes/general/routes');
 const letterRoutes = require('./routes/letter/routes');
+const stampRoutes = require('./routes/stamp/routes');
 
-// Using Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
+// Importing Custom Middlewares
+const { ValidateUser } = require('./middlewares/auth/verifyUser');
+const AuthorizeAdmin = require('./middlewares/auth/authorize');
+
+// Routes Setup
 app.use('/api', generalRoutes);
-app.use('/api/letter', letterRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', ValidateUser, AuthorizeAdmin, adminRoutes);
+app.use('/api/user', ValidateUser, userRoutes);
+app.use('/api/stamp', ValidateUser, stampRoutes);
+app.use('/api/letter', ValidateUser, letterRoutes);
 
+// App Running
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
