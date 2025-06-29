@@ -1,6 +1,8 @@
 const User = require("../../models/user/model");
 const bcrypt = require("bcryptjs");
 const { generateToken } = require("../../utils/auth");
+const { setCookie, clearCookie } = require("../../utils/cookie");
+const sendGeneralMail = require("../../services/emails/sendGeneralMail");
 
 const handleRegister = async (req, res) => {
   try {
@@ -47,6 +49,17 @@ const handleRegister = async (req, res) => {
 
     await newUser.save();
 
+    const emailRes = await sendGeneralMail({
+      to: email,
+      subject: "Account Created Successfully",
+      title: "Welcome to Pen Mail",
+      body: "Thank you for registering with Pen Mail! We're excited to have you on board. You can now connect with people around the world, share your thoughts, and explore new cultures.",
+    });
+
+    if (!emailRes) {
+      return res.status(500).json({success: false, message: "Error sending welcome email" });
+    }
+
     res.status(201).json({
       success: true,
       message: "User registered successfully",
@@ -91,12 +104,7 @@ const handleLogin = async (req, res) => {
       return res.status(500).json({success: false, message: "Error generating token" });
     }
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set secure flag in production
-      sameSite: "Lax", 
-      maxAge: 24 * 3600000, // 24 hours
-    });
+    setCookie(res, token);
     
     res.status(200).json({
       success: true,
@@ -112,8 +120,14 @@ const handleLogin = async (req, res) => {
 };
 
 const handleLogout = (req, res) => {
-  // Handle logout logic here, e.g., invalidate token
-  res.status(200).json({success: true, message: "User logged out successfully"});
+  try {
+    clearCookie(res);
+
+    res.status(200).json({success: true, message: "User logged out successfully"});
+  } catch (error) {
+    console.error("Error logging out user:", error);
+    res.status(500).json({success: false, message: "Internal server error", error: error.message});
+  }
 };
 
 module.exports = {
