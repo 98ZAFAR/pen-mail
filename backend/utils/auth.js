@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-const generateToken = (payload)=>{
+const generateToken = (payload, expiresIn = '24h')=>{
   try {
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
   } catch (error) {
     console.error("Error generating token:", error);
     return null;

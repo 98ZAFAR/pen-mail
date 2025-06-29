@@ -10,7 +10,6 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
 // Express Middleware Setup
 app.use(cookieParser());
 app.use(cors(
@@ -27,15 +26,14 @@ app.use(express.urlencoded({ extended: false }));
 // Importing Routes
 const authRoutes = require('./routes/auth/routes');
 const userRoutes = require('./routes/user/routes');
-
-//Home Route
-app.get('/', (req, res) => {
-    res.status(200).json({message:"Welcome to Pen Mail API!"});
-});
+const generalRoutes = require('./routes/general/routes');
+const letterRoutes = require('./routes/letter/routes');
 
 // Using Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api', generalRoutes);
+app.use('/api/letter', letterRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
