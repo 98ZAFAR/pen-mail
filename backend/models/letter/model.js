@@ -25,8 +25,12 @@ const letterSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["sent", "received", "read"],
+    enum: ["draft", "sent", "received", "read", "archived"],
     default: "sent",
+  },
+  isArchived: {
+    type: Boolean,
+    default: false,
   },
   deliveredAt: {
     type: Date,

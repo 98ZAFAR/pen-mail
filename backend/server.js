@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 // Importing required modules
 const express = require('express');
 const cors = require('cors');
+const { generalLimiter } = require('./middlewares/rateLimiter');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,9 @@ app.use(cors(
 ));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Apply rate limiting to all routes
+app.use(generalLimiter);
 
 //Scheduler Setup
 require('./services/schedulers/letterDelivery');
