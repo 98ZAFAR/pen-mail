@@ -1,6 +1,17 @@
-# PenMail Backend
+<div align="center">
+
+# ✉️ Pen Mail API
+
+*A Modern Pen Pal Platform - Connect with People Worldwide*
+
+[![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-v5.1.0-blue.svg)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-v8.16+-brightgreen.svg)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-ISC-yellow.svg)](LICENSE)
 
 This is the backend service for the PenMail website. It provides RESTful APIs for user authentication, letter management, friend system, and more.
+
+</div>
 
 ## 🚀 Features
 

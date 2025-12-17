@@ -3,9 +3,10 @@ const FriendRequest = require("../../models/friend/model");
 
 const { generateToken } = require("../../utils/auth");
 const { setCookie } = require("../../utils/cookie");
+const logger = require("../../utils/logger");
 
 const getUserProfile = async (req, res) => {
-  console.log("Fetching user profile...");
+  logger.info("Fetching user profile", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const user = await User.findById(userId).select("-password"); // Exclude password from response
@@ -22,7 +23,7 @@ const getUserProfile = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    logger.error("Error fetching user profile", { userId: req.user._id, error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -32,7 +33,7 @@ const getUserProfile = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-  console.log("Updating user profile...");
+  logger.info("Updating user profile", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const avatarUrl = req.file ? req.file.path : req.user.avatarUrl;
@@ -72,7 +73,7 @@ const updateUserProfile = async (req, res) => {
       user: updatedUser,
     });
   } catch (error) {
-    console.error("Error updating user profile:", error);
+    logger.error("Error updating user profile", { userId: req.user._id, error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -82,7 +83,7 @@ const updateUserProfile = async (req, res) => {
 };
 
 const connectFriend = async (req, res) => {
-  console.log("Connecting friend...");
+  logger.info("Sending friend request", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const friendId = req.params.friendId || req.body.friendId;
@@ -148,7 +149,7 @@ const connectFriend = async (req, res) => {
       friendRequest: newFriendRequest,
     });
   } catch (error) {
-    console.error("Error adding friend:", error);
+    logger.error("Error connecting friend", { userId: req.user._id, error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -158,7 +159,7 @@ const connectFriend = async (req, res) => {
 };
 
 const getFriends = async (req, res) => {
-  console.log("Fetching friends list...");
+  logger.info("Fetching friends", { userId: req.user._id });
   try {
     const userId = req.user._id;
 
@@ -179,7 +180,7 @@ const getFriends = async (req, res) => {
       friends: user.friends,
     });
   } catch (error) {
-    console.error("Error fetching friends list:", error);
+    logger.error("Error fetching friends", { userId: req.user._id, error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -189,7 +190,7 @@ const getFriends = async (req, res) => {
 };
 
 const getFriendProfile = async (req, res) => {
-  console.log("Fetching friend profile...");
+  logger.info("Fetching friend profile", { userId: req.user._id });
   try {
     const friendId = req.params.friendId;
 
@@ -215,7 +216,7 @@ const getFriendProfile = async (req, res) => {
       friend,
     });
   } catch (error) {
-    console.error("Error fetching friend profile:", error);
+    logger.error("Error fetching friend profile", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -225,7 +226,7 @@ const getFriendProfile = async (req, res) => {
 };
 
 const acceptFriendRequest = async (req, res) => {
-  console.log("Accepting friend request...");
+  logger.info("Accepting friend request", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const { requestId } = req.params || req.body;
@@ -264,7 +265,7 @@ const acceptFriendRequest = async (req, res) => {
       friendRequest: request,
     });
   } catch (error) {
-    console.error("Error accepting friend request:", error);
+    logger.error("Error accepting friend request", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -274,7 +275,7 @@ const acceptFriendRequest = async (req, res) => {
 };
 
 const rejectFriendRequest = async (req, res) => {
-  console.log("Rejecting friend request...");
+  logger.info("Rejecting friend request", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const { requestId } = req.params || req.body;
@@ -304,7 +305,7 @@ const rejectFriendRequest = async (req, res) => {
       friendRequest: request,
     });
   } catch (error) {
-    console.error("Error rejecting friend request:", error);
+    logger.error("Error rejecting friend request", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -314,7 +315,7 @@ const rejectFriendRequest = async (req, res) => {
 };
 
 const cancelFriendRequest = async (req, res) => {
-  console.log("Canceling friend request...");
+  logger.info("Canceling friend request", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const { requestId } = req.params || req.body;
@@ -349,7 +350,7 @@ const cancelFriendRequest = async (req, res) => {
       message: "Friend request canceled successfully",
     });
   } catch (error) {
-    console.error("Error canceling friend request:", error);
+    logger.error("Error canceling friend request", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -359,7 +360,7 @@ const cancelFriendRequest = async (req, res) => {
 };
 
 const getFriendRequests = async (req, res) => {
-  console.log("Fetching friend requests...");
+  logger.info("Fetching friend requests", { userId: req.user._id });
   try {
     const userId = req.user._id;
 
@@ -386,7 +387,7 @@ const getFriendRequests = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching friend requests:", error);
+    logger.error("Error fetching friend requests", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -396,7 +397,7 @@ const getFriendRequests = async (req, res) => {
 };
 
 const unfriend = async (req, res) => {
-  console.log("Unfriending user...");
+  logger.info("Unfriending user", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const friendId = req.params.friendId || req.body.friendId;
@@ -441,7 +442,7 @@ const unfriend = async (req, res) => {
       message: "Friend removed successfully",
     });
   } catch (error) {
-    console.error("Error unfriending user:", error);
+    logger.error("Error unfriending user", { userId: req.user._id, error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -451,7 +452,7 @@ const unfriend = async (req, res) => {
 };
 
 const getDiscoverUsers = async (req, res) => {
-  console.log("Fetching discover users...");
+  logger.info("Fetching discover users", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const { languages, interests, friends } = await User.findById(
@@ -480,7 +481,7 @@ const getDiscoverUsers = async (req, res) => {
       users,
     });
   } catch (error) {
-    console.error("Error fetching discover users:", error);
+    logger.error("Error fetching discover users", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -490,7 +491,7 @@ const getDiscoverUsers = async (req, res) => {
 };
 
 const blockUser = async (req, res) => {
-  console.log("Blocking user...");
+  logger.info("Blocking user", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const blockUserId = req.params.userId || req.body.userId;
@@ -555,7 +556,7 @@ const blockUser = async (req, res) => {
       message: "User blocked successfully",
     });
   } catch (error) {
-    console.error("Error blocking user:", error);
+    logger.error("Error blocking user", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -565,7 +566,7 @@ const blockUser = async (req, res) => {
 };
 
 const unblockUser = async (req, res) => {
-  console.log("Unblocking user...");
+  logger.info("Unblocking user", { userId: req.user._id });
   try {
     const userId = req.user._id;
     const unblockUserId = req.params.userId || req.body.userId;
@@ -604,7 +605,7 @@ const unblockUser = async (req, res) => {
       message: "User unblocked successfully",
     });
   } catch (error) {
-    console.error("Error unblocking user:", error);
+    logger.error("Error unblocking user", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -614,7 +615,7 @@ const unblockUser = async (req, res) => {
 };
 
 const getBlockedUsers = async (req, res) => {
-  console.log("Fetching blocked users...");
+  logger.info("Fetching blocked users", { userId: req.user._id });
   try {
     const userId = req.user._id;
 
@@ -635,7 +636,7 @@ const getBlockedUsers = async (req, res) => {
       blockedUsers: user.blockedUsers,
     });
   } catch (error) {
-    console.error("Error fetching blocked users:", error);
+    logger.error("Error fetching blocked users", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -645,7 +646,7 @@ const getBlockedUsers = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  console.log("Deleting user...");
+  logger.info("Deleting user", { targetUserId: req.params.userId });
   try {
     const userId = req.user._id;
 
@@ -663,7 +664,7 @@ const deleteUser = async (req, res) => {
       message: "User deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting user:", error);
+    logger.error("Error deleting user", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",

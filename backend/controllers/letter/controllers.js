@@ -2,6 +2,7 @@ const Letter = require("../../models/letter/model");
 const Stamp = require("../../models/stamp/model");
 const User = require("../../models/user/model");
 const CalculateDelay = require("../../utils/calcDelay");
+const logger = require("../../utils/logger");
 
 const sendLetter = async (req, res) => {
   try {
@@ -68,11 +69,11 @@ const sendLetter = async (req, res) => {
 
     await newLetter.save();
 
-    console.log(
-      isDraft
-        ? `Draft saved: ${subject}`
-        : `Letter sent to ${recipientId}: ${body} (Subject: ${subject}, Stamp ID: ${stampId})`
-    );
+    if (isDraft) {
+      logger.info("Draft saved", { senderId, subject });
+    } else {
+      logger.success("Letter sent", { senderId, recipientId, subject, stampId });
+    }
 
     if (stampId && !isDraft) {
       await User.findByIdAndUpdate(
@@ -81,7 +82,7 @@ const sendLetter = async (req, res) => {
           $addToSet: { collectedStamps: stampId },
         }
       ).catch((error) => {
-        console.error("Error updating user's collected stamps:", error);
+        logger.error("Error updating user's collected stamps", { error: error.message });
         return res.status(500).json({
           success: false,
           message: "Internal server error while updating stamps.",
@@ -95,7 +96,7 @@ const sendLetter = async (req, res) => {
       letter: newLetter,
     });
   } catch (error) {
-    console.error("Error sending letter:", error);
+    logger.error("Error sending letter", { error: error.message, senderId: req.user._id });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -154,7 +155,7 @@ const getInbox = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching inbox:", error);
+    logger.error("Error fetching inbox", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -213,7 +214,7 @@ const getOutbox = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching outbox:", error);
+    logger.error("Error fetching outbox", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -242,7 +243,7 @@ const getLetter = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Letter fetched successfully.", letter });
   } catch (error) {
-    console.error("Error fetching letter:", error);
+    logger.error("Error fetching letter", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -277,7 +278,7 @@ const getDrafts = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching drafts:", error);
+    logger.error("Error fetching drafts", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -324,7 +325,7 @@ const updateDraft = async (req, res) => {
       letter,
     });
   } catch (error) {
-    console.error("Error updating draft:", error);
+    logger.error("Error updating draft", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -402,7 +403,7 @@ const sendDraft = async (req, res) => {
       letter,
     });
   } catch (error) {
-    console.error("Error sending draft:", error);
+    logger.error("Error sending draft", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -439,7 +440,7 @@ const archiveLetter = async (req, res) => {
       message: "Letter archived successfully.",
     });
   } catch (error) {
-    console.error("Error archiving letter:", error);
+    logger.error("Error archiving letter", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -475,7 +476,7 @@ const unarchiveLetter = async (req, res) => {
       message: "Letter unarchived successfully.",
     });
   } catch (error) {
-    console.error("Error unarchiving letter:", error);
+    logger.error("Error unarchiving letter", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -512,7 +513,7 @@ const getArchivedLetters = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching archived letters:", error);
+    logger.error("Error fetching archived letters", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -538,13 +539,13 @@ const deleteLetter = async (req, res) => {
 
     await Letter.findByIdAndDelete(letterId);
 
-    console.log(`Letter with ID ${letterId} deleted successfully.`);
+    logger.success("Letter deleted successfully", { letterId, userId: req.user._id });
 
     res
       .status(200)
       .json({ success: true, message: "Letter deleted successfully." });
   } catch (error) {
-    console.error("Error deleting letter:", error);
+    logger.error("Error deleting letter", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };

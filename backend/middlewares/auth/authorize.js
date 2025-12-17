@@ -1,3 +1,5 @@
+const logger = require("../../utils/logger");
+
 const AuthorizeAdmin = (req, res, next) => {
   try {
     const userRole = req.user.role; // Assuming req.user is populated with the authenticated user's info
@@ -8,7 +10,7 @@ const AuthorizeAdmin = (req, res, next) => {
   
     next();
   } catch (error) {
-    console.error("Authorization error:", error);
+    logger.error("Authorization error", { error: error.message, userId: req.user?.id });
     return res.status(500).json({ success: false, message: "Internal server error" });
     
   }

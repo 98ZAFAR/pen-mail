@@ -1,5 +1,6 @@
 const generalMailTemplate = require("../template/generalMailTemplate");
 const transporter = require("../../utils/mailer");
+const logger = require("../../utils/logger");
 
 const sendGeneralMail = async ({ to, subject, title, body }) => {
   try {
@@ -13,10 +14,10 @@ const sendGeneralMail = async ({ to, subject, title, body }) => {
       }),
     });
 
-    console.log("Email sent:", info.messageId);
+    logger.success("Email sent", { to, subject, messageId: info.messageId });
     return true;
   } catch (err) {
-    console.error("Mail send error:", err);
+    logger.error("Mail send error", { to, subject, error: err.message });
     return false;
   }
 };

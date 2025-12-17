@@ -1,7 +1,8 @@
 const User = require("../../models/user/model");
+const logger = require("../../utils/logger");
 
 const handleGetAllUsers = async (req, res) => {
-  console.log("Fetching all users...");
+  logger.info("Fetching all users");
   try {
     const users = await User.find().select("-password");
 
@@ -12,13 +13,14 @@ const handleGetAllUsers = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    logger.info(`Fetched ${users.length} users from the database.`);
+    return res.status(200).json({
       success: true,
       message: "Users fetched successfully",
       users,
     });
   } catch (error) {
-    console.error("Error fetching users:", error);
+    logger.error("Error fetching users", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -28,7 +30,7 @@ const handleGetAllUsers = async (req, res) => {
 };
 
 const handleGetUserProfile = async (req, res) => {
-  console.log("Fetching user profile...");
+  logger.info("Fetching user profile", { userId: req.params.userId || req.body.userId });
   try {
     const userId = req.params.userId || req.body.userId;
     if (!userId) {
@@ -52,7 +54,7 @@ const handleGetUserProfile = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    logger.error("Error fetching user profile", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",

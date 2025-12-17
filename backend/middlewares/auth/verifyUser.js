@@ -1,4 +1,5 @@
 const { verifyToken } = require("../../utils/auth");
+const logger = require("../../utils/logger");
 
 const ValidateUser = (req, res, next) => {
   try {
@@ -17,7 +18,7 @@ const ValidateUser = (req, res, next) => {
     req.user = decoded; // Attach user info to request
     next();
   } catch (error) {
-    console.error("Token verification error:", error);
+    logger.error("Token verification error", { error: error.message });
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });

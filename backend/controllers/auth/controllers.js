@@ -4,6 +4,7 @@ const { generateToken, verifyToken } = require("../../utils/auth");
 const { setCookie, clearCookie } = require("../../utils/cookie");
 const sendGeneralMail = require("../../services/emails/sendGeneralMail");
 const sendResetPasswordMail = require("../../services/emails/sendResetPasswordMail");
+const logger = require("../../utils/logger");
 
 const handleRegister = async (req, res) => {
   try {
@@ -53,6 +54,7 @@ const handleRegister = async (req, res) => {
     });
 
     await newUser.save();
+    logger.success("User registered successfully", { email, nickName });
 
     const emailRes = await sendGeneralMail({
       to: email,
@@ -73,7 +75,7 @@ const handleRegister = async (req, res) => {
       user: newUser,
     });
   } catch (error) {
-    console.error("Error registering user:", error);
+    logger.error("Error registering user", { error: error.message, stack: error.stack });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -121,6 +123,7 @@ const handleLogin = async (req, res) => {
     }
 
     setCookie(res, token);
+    logger.info("User logged in successfully", { userId: user._id, email: user.email });
 
     res.status(200).json({
       success: true,
@@ -129,7 +132,7 @@ const handleLogin = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error("Error logging in user:", error);
+    logger.error("Error logging in user", { error: error.message, stack: error.stack });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -141,12 +144,13 @@ const handleLogin = async (req, res) => {
 const handleLogout = (req, res) => {
   try {
     clearCookie(res);
+    logger.info("User logged out");
 
     res
       .status(200)
       .json({ success: true, message: "User logged out successfully" });
   } catch (error) {
-    console.error("Error logging out user:", error);
+    logger.error("Error logging out user", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -175,7 +179,7 @@ const handleForgotPassword = async (req, res) => {
       "1h"
     );
 
-    console.log("Generated token for forgot password:", token);
+    logger.debug("Generated token for forgot password", { email });
     if (!token) {
       return res
         .status(500)
@@ -200,7 +204,7 @@ const handleForgotPassword = async (req, res) => {
       message: "Reset password email sent successfully",
     });
   } catch (error) {
-    console.error("Error in forgot password:", error);
+    logger.error("Error in forgot password", { error: error.message, stack: error.stack });
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -236,13 +240,14 @@ const handleResetPassword = async (req, res) => {
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
+    logger.success("Password reset successfully", { userId: user._id, email: user.email });
 
     res.status(200).json({
       success: true,
       message: "Password reset successfully",
     });
   } catch (error) {
-    console.error("Error in reset password:", error);
+    logger.error("Error resetting password", { error: error.message, stack: error.stack });
     res.status(500).json({
       success: false,
       message: "Internal server error",

@@ -1,5 +1,6 @@
 const Stamp = require("../../models/stamp/model");
 const User = require("../../models/user/model");
+const logger = require("../../utils/logger");
 
 const createStamp = async (req, res) => {
   try {
@@ -28,7 +29,7 @@ const createStamp = async (req, res) => {
       stamp: newStamp,
     });
   } catch (error) {
-    console.error("Error creating stamp:", error);
+    logger.error("Error creating stamp", { error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -68,7 +69,7 @@ const editStamp = async (req, res) => {
       stamp: updatedStamp,
     });
   } catch (error) {
-    console.error("Error updating stamp:", error);
+    logger.error("Error updating stamp", { error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -89,7 +90,7 @@ const deleteStamp = async (req, res) => {
       message: "Stamp deleted successfully.",
     });
   } catch (error) {
-    console.error("Error deleting stamp:", error);
+    logger.error("Error deleting stamp", { error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -112,7 +113,7 @@ const getAllStamps = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Stamps fetched successfully.", stamps });
   } catch (error) {
-    console.error("Error fetching stamps:", error);
+    logger.error("Error fetching stamps", { error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -143,7 +144,7 @@ const collectStamp = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Stamp collected successfully." });
   } catch (error) {
-    console.error("Error collecting stamp:", error);
+    logger.error("Error collecting stamp", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
@@ -165,7 +166,7 @@ const getMyStamps = async (req, res) => {
       stamps: user.collectedStamps,
     });
   } catch (error) {
-    console.error("Error fetching collected stamps:", error);
+    logger.error("Error fetching user's stamps", { userId: req.user._id, error: error.message });
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };

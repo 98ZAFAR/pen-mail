@@ -1,6 +1,7 @@
 const crons = require("node-cron");
 const Letter = require("../../models/letter/model");
 const sendGeneralMail = require("../emails/sendGeneralMail");
+const logger = require("../../utils/logger");
 
 // Scheduler to deliver letters every minute
 crons.schedule("* * * * *", async () => {
@@ -15,7 +16,7 @@ crons.schedule("* * * * *", async () => {
       { $set: { status: "received" } }
     );
     if (letters.modifiedCount === 0) {
-      console.log("No letters to deliver at this time.");
+      logger.debug("No letters to deliver at this time");
       return;
     }
 
@@ -28,15 +29,15 @@ crons.schedule("* * * * *", async () => {
           title: `New Letter from ${sender.nickName}`,
           body: body,
         });
-        console.log(`Letter delivered to ${recipient.email}`);
+        logger.success("Letter delivered", { to: recipient.email, subject });
       } catch (error) {
-        console.error(`Failed to deliver letter to ${recipient.email}:`, error);
+        logger.error("Failed to deliver letter", { to: recipient.email, error: error.message });
       }
     });
     
-    console.log(`${letters.modifiedCount} letters delivered.`);
+    logger.info(`${letters.modifiedCount} letters delivered`);
   } catch (error) {
-    console.error("Error delivering letters:", error);
+    logger.error("Error delivering letters", { error: error.message, stack: error.stack });
   }
 });
 

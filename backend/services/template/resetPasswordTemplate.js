@@ -1,6 +1,5 @@
 function resetPasswordTemplate({token, userName}) {
     const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
-    console.log("Reset link : ", resetLink);
     return `
         <!DOCTYPE html>
         <html>

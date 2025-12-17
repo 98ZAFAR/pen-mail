@@ -10,10 +10,10 @@ const sendResetPasswordMail = async ({ to, token, userName }) => {
       html: resetPasswordTemplate({ token, userName }),
     });
 
-    console.log("Reset password email sent:", info.messageId);
+    logger.success("Password reset email sent", { to, messageId: info.messageId });
     return true;
   } catch (err) {
-    console.error("Error sending reset password email:", err);
+    logger.error("Error sending reset password email", { to, error: err.message });
     return false;
   }
 };
