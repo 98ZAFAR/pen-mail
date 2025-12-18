@@ -32,6 +32,6 @@ export async function forgotPassword(email: string) {
 /**
  * Reset password with token
  */
-export async function resetPassword(token: string, password: string) {
-  return apiPost(`/auth/reset-password/${token}`, { password });
+export async function resetPassword(token: string, newPassword: string) {
+  return apiPost(`/auth/reset-password/${token}`, { newPassword });
 }

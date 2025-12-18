@@ -1,67 +1,41 @@
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+
 // API Configuration
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
-interface FetchOptions extends RequestInit {
-  timeout?: number;
-}
+// Create axios instance
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  withCredentials: true, // Include cookies in requests
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-interface ApiResponse<T> {
+// Response interceptor for error handling
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response) {
+      // Server responded with error
+      const errorData = error.response.data as any;
+      throw new Error(errorData?.message || `HTTP Error: ${error.response.status}`);
+    } else if (error.request) {
+      // Request made but no response
+      throw new Error('No response from server');
+    } else if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timeout');
+    } else {
+      throw new Error('An unexpected error occurred');
+    }
+  }
+);
+
+export interface ApiResponse<T> {
   success: boolean;
   message: string;
   data?: T;
-}
-
-/**
- * Generic fetch wrapper with error handling and timeout support
- */
-async function fetchApi<T>(
-  endpoint: string,
-  options: FetchOptions = {}
-): Promise<ApiResponse<T>> {
-  const { timeout = 10000, ...fetchOptions } = options;
-
-  const url = `${API_BASE_URL}${endpoint}`;
-  const headers = {
-    "Content-Type": "application/json",
-    ...fetchOptions.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(url, {
-      ...fetchOptions,
-      headers,
-      signal: controller.signal,
-      credentials: "include", // Include cookies in requests
-    });
-
-    clearTimeout(timeoutId);
-
-    // Handle response
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        message: "An error occurred",
-      }));
-      throw new Error(errorData.message || `HTTP Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    clearTimeout(timeoutId);
-
-    if (error instanceof Error) {
-      if (error.name === "AbortError") {
-        throw new Error("Request timeout");
-      }
-      throw error;
-    }
-
-    throw new Error("An unexpected error occurred");
-  }
 }
 
 /**
@@ -69,9 +43,10 @@ async function fetchApi<T>(
  */
 export async function apiGet<T>(
   endpoint: string,
-  options?: FetchOptions
+  config?: AxiosRequestConfig
 ): Promise<ApiResponse<T>> {
-  return fetchApi<T>(endpoint, { ...options, method: "GET" });
+  const response = await axiosInstance.get<ApiResponse<T>>(endpoint, config);
+  return response.data;
 }
 
 /**
@@ -80,13 +55,10 @@ export async function apiGet<T>(
 export async function apiPost<T>(
   endpoint: string,
   data?: unknown,
-  options?: FetchOptions
+  config?: AxiosRequestConfig
 ): Promise<ApiResponse<T>> {
-  return fetchApi<T>(endpoint, {
-    ...options,
-    method: "POST",
-    body: data ? JSON.stringify(data) : undefined,
-  });
+  const response = await axiosInstance.post<ApiResponse<T>>(endpoint, data, config);
+  return response.data;
 }
 
 /**
@@ -95,13 +67,10 @@ export async function apiPost<T>(
 export async function apiPut<T>(
   endpoint: string,
   data?: unknown,
-  options?: FetchOptions
+  config?: AxiosRequestConfig
 ): Promise<ApiResponse<T>> {
-  return fetchApi<T>(endpoint, {
-    ...options,
-    method: "PUT",
-    body: data ? JSON.stringify(data) : undefined,
-  });
+  const response = await axiosInstance.put<ApiResponse<T>>(endpoint, data, config);
+  return response.data;
 }
 
 /**
@@ -109,12 +78,10 @@ export async function apiPut<T>(
  */
 export async function apiDelete<T>(
   endpoint: string,
-  options?: FetchOptions
+  config?: AxiosRequestConfig
 ): Promise<ApiResponse<T>> {
-  return fetchApi<T>(endpoint, {
-    ...options,
-    method: "DELETE",
-  });
+  const response = await axiosInstance.delete<ApiResponse<T>>(endpoint, config);
+  return response.data;
 }
 
 /**
@@ -123,45 +90,32 @@ export async function apiDelete<T>(
 export async function apiPostFormData<T>(
   endpoint: string,
   formData: FormData,
-  options?: FetchOptions
+  config?: AxiosRequestConfig
 ): Promise<ApiResponse<T>> {
-  const url = `${API_BASE_URL}${endpoint}`;
-  const controller = new AbortController();
-  const timeout = options?.timeout || 10000;
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const response = await axiosInstance.post<ApiResponse<T>>(endpoint, formData, {
+    ...config,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      ...config?.headers,
+    },
+  });
+  return response.data;
+}
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-      signal: controller.signal,
-      ...options,
-      headers: {
-        ...options?.headers,
-        // Remove Content-Type header to let the browser set it with boundary
-      },
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        message: "An error occurred",
-      }));
-      throw new Error(errorData.message || `HTTP Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error) {
-      if (error.name === "AbortError") {
-        throw new Error("Request timeout");
-      }
-      throw error;
-    }
-    throw new Error("An unexpected error occurred");
-  }
+/**
+ * FormData PUT request (for file uploads)
+ */
+export async function apiPutFormData<T>(
+  endpoint: string,
+  formData: FormData,
+  config?: AxiosRequestConfig
+): Promise<ApiResponse<T>> {
+  const response = await axiosInstance.put<ApiResponse<T>>(endpoint, formData, {
+    ...config,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      ...config?.headers,
+    },
+  });
+  return response.data;
 }

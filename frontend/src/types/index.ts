@@ -100,16 +100,26 @@ export interface FriendRequest {
   updatedAt: string;
 }
 
+// Pagination Types
+export interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
 // API Response Wrapper
 export interface ApiErrorResponse {
   success: false;
   message: string;
+  errors?: Array<{ field: string; message: string }>;
 }
 
 export interface ApiSuccessResponse<T> {
   success: true;
   message: string;
   data: T;
+  pagination?: PaginationInfo;
 }
 
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;

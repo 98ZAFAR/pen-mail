@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
+import { logoutUser } from '@/utils';
 
 const dashboardLinks = [
   { label: 'Dashboard', href: '/dashboard', active: true },
@@ -20,7 +21,8 @@ export default function DashboardLayout({
 }) {
   const handleLogout = () => {
     // TODO: Implement logout
-    console.log('Logout clicked');
+    const res = logoutUser();
+    console.log('Logout: ', res);
   };
 
   return (

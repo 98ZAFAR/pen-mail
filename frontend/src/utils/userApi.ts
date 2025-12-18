@@ -1,4 +1,4 @@
-import { apiGet, apiPut, apiDelete } from './api';
+import { apiGet, apiPut, apiDelete, apiPutFormData } from './api';
 import { User, FriendRequest } from '@/types';
 
 /**
@@ -6,6 +6,13 @@ import { User, FriendRequest } from '@/types';
  */
 export async function getUserProfile() {
   return apiGet<User>('/user/profile');
+}
+
+/**
+ * Update user profile
+ */
+export async function updateUserProfile(formData: FormData) {
+  return apiPutFormData<User>('/user/update', formData);
 }
 
 /**
@@ -44,10 +51,10 @@ export async function unfriend(friendId: string) {
 }
 
 /**
- * Get friend requests
+ * Get friend requests (received and sent)
  */
 export async function getFriendRequests() {
-  return apiGet<FriendRequest[]>('/user/friend-requests');
+  return apiGet<{ received: FriendRequest[]; sent: FriendRequest[] }>('/user/friend-requests');
 }
 
 /**
@@ -65,7 +72,7 @@ export async function rejectFriendRequest(requestId: string) {
 }
 
 /**
- * Cancel friend request
+ * Cancel sent friend request
  */
 export async function cancelFriendRequest(requestId: string) {
   return apiDelete(`/user/friend-request/cancel/${requestId}`);
