@@ -18,8 +18,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "PenMail",
-  description: "A modern email client built for productivity and ease of use.",
+  title: "PenMail - Connect Through Letters",
+  description: "Send e-letters to your pen pals around the world. Collect stamps, make friends, and share stories.",
 };
 
 export default function RootLayout({

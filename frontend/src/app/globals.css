@@ -1,27 +1,113 @@
 @import "tailwindcss";
 
+/* ============================================
+   TAILWIND V4 THEME CONFIGURATION
+   ============================================ */
+@theme {
+  /* Custom Colors for Tailwind */
+  --color-primary: #3b82f6;
+  --color-primary-light: #dbeafe;
+  --color-primary-dark: #1e40af;
+  --color-secondary: #a855f7;
+  --color-secondary-light: #f3e8ff;
+  --color-secondary-dark: #7e22ce;
+  --color-accent: #ec4899;
+  --color-accent-light: #fce7f3;
+  --color-background: #ffffff;
+  --color-surface: #f9fafb;
+  --color-foreground: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #0ea5e9;
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-lg: rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   CUSTOM CSS VARIABLES (FOR INLINE STYLES)
+   ============================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Colors */
+  --color-primary: #3b82f6;
+  --color-primary-light: #dbeafe;
+  --color-primary-dark: #1e40af;
+  
+  /* Secondary Colors */
+  --color-secondary: #a855f7;
+  --color-secondary-light: #f3e8ff;
+  --color-secondary-dark: #7e22ce;
+  
+  /* Accent Colors */
+  --color-accent: #ec4899;
+  --color-accent-light: #fce7f3;
+  
+  /* Neutral Colors */
+  --color-background: #ffffff;
+  --color-surface: #f9fafb;
+  --color-foreground: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #0ea5e9;
+  
+  /* Border & Shadow */
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-lg: rgba(0, 0, 0, 0.15);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-nunito: var(--font-nunito);
-}
-
+/* ============================================
+   DARK MODE
+   ============================================ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-primary: #60a5fa;
+    --color-primary-light: #1e3a8a;
+    --color-primary-dark: #93c5fd;
+    --color-secondary: #d8b4fe;
+    --color-secondary-light: #4c1d95;
+    --color-secondary-dark: #e879f9;
+    --color-accent: #f472b6;
+    --color-accent-light: #831843;
+    --color-background: #0f172a;
+    --color-surface: #1e293b;
+    --color-foreground: #f1f5f9;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-error: #f87171;
+    --color-info: #38bdf8;
+    --color-border: #334155;
+    --color-border-light: #475569;
+    --color-shadow: rgba(0, 0, 0, 0.3);
+    --color-shadow-lg: rgba(0, 0, 0, 0.5);
   }
 }
 
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Helper utility class */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
